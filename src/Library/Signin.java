@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -14,20 +15,33 @@ import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
 
 public class Signin extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField tfAd;
-	private JLabel lblNewLabel_1;
-	private JTextField tfSoyad;
-	private JLabel lblNewLabel_2;
+	private JTextField tfkulad;
+	private JLabel lblsifre;
+	private JTextField tfsifre;
+	private JLabel lblemail;
 	private JTextField tfEmail;
-	private JTextField tfTelefonNo;
-	private JLabel lblNewLabel_3;
+	private JTextField tftel;
+	private JLabel lbltel;
 	private JButton btnKayitOl;
+	private JTextField tfsoyad;
+	private JTextField tfad;
+	private JLabel lblNewLabel_4;
+	private JLabel lblkulad;
+	static final String DB="jdbc:mysql://127.0.0.1:3306/mydb";
+	static final String USER="root";
+	static final String PASS="13577";
 
 	/**
 	 * Launch the application.
@@ -53,61 +67,140 @@ public class Signin extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.DARK_GRAY);
 		contentPane.setName("Signin");
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Ad");
-		lblNewLabel.setBounds(272, 192, 68, 28);
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 10));
-		contentPane.add(lblNewLabel);
+		JLabel lblad = new JLabel("Ad");
+		lblad.setBounds(272, 106, 68, 28);
+		lblad.setFont(new Font("Tahoma", Font.BOLD, 10));
+		contentPane.add(lblad);
+		lblkulad = new JLabel("Kullanıcı Adı");
+		lblkulad.setBounds(272, 192, 68, 28);
+		lblkulad.setFont(new Font("Tahoma", Font.BOLD, 10));
+		contentPane.add(lblkulad);
 		
-		tfAd = new JTextField();
-		tfAd.setBounds(388, 197, 96, 19);
-		contentPane.add(tfAd);
-		tfAd.setColumns(10);
+		tfkulad = new JTextField();
+		tfkulad.setBounds(388, 197, 96, 19);
+		contentPane.add(tfkulad);
+		tfkulad.setColumns(10);
+
 		
-		lblNewLabel_1 = new JLabel("Soyad");
-		lblNewLabel_1.setBounds(272, 235, 68, 28);
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 10));
-		contentPane.add(lblNewLabel_1);
+		lblsifre = new JLabel("Şifre");
+		lblsifre.setBounds(272, 235, 68, 28);
+		lblsifre.setFont(new Font("Tahoma", Font.BOLD, 10));
+		contentPane.add(lblsifre);
 		
-		tfSoyad = new JTextField();
-		tfSoyad.setBounds(388, 240, 96, 19);
-		contentPane.add(tfSoyad);
-		tfSoyad.setColumns(10);
+		tfsifre = new JTextField();
+		tfsifre.setBounds(388, 240, 96, 19);
+		contentPane.add(tfsifre);
+		tfsifre.setColumns(10);
 		
-		lblNewLabel_2 = new JLabel("E-Mail");
-		lblNewLabel_2.setBounds(272, 278, 68, 28);
-		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 10));
-		contentPane.add(lblNewLabel_2);
+		lblemail = new JLabel("E-Mail");
+		lblemail.setBounds(272, 278, 68, 28);
+		lblemail.setFont(new Font("Tahoma", Font.BOLD, 10));
+		contentPane.add(lblemail);
 		
 		tfEmail = new JTextField();
 		tfEmail.setBounds(388, 283, 96, 19);
 		contentPane.add(tfEmail);
 		tfEmail.setColumns(10);
 		
-		tfTelefonNo = new JTextField();
-		tfTelefonNo.setBounds(388, 326, 96, 19);
-		contentPane.add(tfTelefonNo);
-		tfTelefonNo.setColumns(10);
+		tftel = new JTextField();
+		tftel.setBounds(388, 326, 96, 19);
+		contentPane.add(tftel);
+		tftel.setColumns(10);
 		
-		lblNewLabel_3 = new JLabel("Telefon No");
-		lblNewLabel_3.setBounds(272, 321, 68, 28);
-		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 10));
-		contentPane.add(lblNewLabel_3);
-		
-		btnKayitOl = new JButton("Kayıt Ol");
-		btnKayitOl.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnKayitOl.setBounds(324, 387, 117, 28);
-		btnKayitOl.setForeground(Color.RED);
-		btnKayitOl.setBackground(Color.BLACK);
-		contentPane.add(btnKayitOl);
-	}
+		lbltel = new JLabel("Telefon No");
+		lbltel.setBounds(272, 321, 68, 28);
+		lbltel.setFont(new Font("Tahoma", Font.BOLD, 10));
+		contentPane.add(lbltel);
 
+		JLabel lblsoyad = new JLabel("Soyad");
+		lblsoyad.setFont(new Font("Tahoma", Font.BOLD, 10));
+		lblsoyad.setBounds(272, 149, 68, 28);
+		contentPane.add(lblsoyad);
+		
+		tfsoyad = new JTextField();
+		tfsoyad.setColumns(10);
+		tfsoyad.setBounds(388, 154, 96, 19);
+		contentPane.add(tfsoyad);
+		
+		tfad = new JTextField();
+		tfad.setColumns(10);
+		tfad.setBounds(388, 111, 96, 19);
+		contentPane.add(tfad);
+		
+		JButton btnKayit = new JButton("Kayit Ol");
+		btnKayit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				        String Ad = tfad.getText(); 
+				        String Soyad = tfsoyad.getText(); 
+				        String kadi = tfkulad.getText();
+				        String sifre = tfsifre.getText();
+				        String email = tfEmail.getText();
+				        String telefon = tftel.getText();
+
+				        if (Ad.isEmpty() || Soyad.isEmpty() || kadi.isEmpty() || sifre.isEmpty() || email.isEmpty() || telefon.isEmpty()) {
+				            JOptionPane.showMessageDialog(null, "Lütfen tüm alanları doldurun.");
+				            return; 
+				        }
+				        
+				        try (Connection connection = DriverManager.getConnection(DB, USER, PASS)) {
+				            connection.setAutoCommit(false); 
+
+				            String query = "INSERT INTO `mydb`.`customers`(`Name`,`Surname`,`TelephoneNo`,`Email`) VALUES (?, ?, ?, ?)";
+				            String query1 = "INSERT INTO `mydb`.`users`(`KullanıcıAdı`,`Şifre`,`role_id`) VALUES (?, ?, '2')";
+				            String query2 = "SELECT COUNT(*) AS count FROM `mydb`.`users` WHERE `KullanıcıAdı` = ?";
+				            
+				            try (PreparedStatement statement = connection.prepareStatement(query);
+				                 PreparedStatement statement1 = connection.prepareStatement(query1);
+				            	 PreparedStatement Statement2 = connection.prepareStatement(query2)) {
+
+				            	Statement2.setString(1, kadi);
+				            	
+				            	try (ResultSet resultSet = Statement2.executeQuery()) {
+				                    if (resultSet.next()) {
+				                        int count = resultSet.getInt("count");
+				                        if (count > 0) {
+				                            JOptionPane.showMessageDialog(null, "Bu kullanıcı adı zaten mevcut. Lütfen farklı bir kullanıcı adı seçin.");
+				                            return;
+				                        }
+				                      }
+				                    }
+				                statement.setString(1, Ad);
+				                statement.setString(2, Soyad);
+				                statement.setString(3, telefon);
+				                statement.setString(4, email);
+
+				                statement1.setString(1, kadi);
+				                statement1.setString(2, sifre);
+
+				                int affectedRows1 = statement.executeUpdate();
+				                int affectedRows2 = statement1.executeUpdate();
+
+				                if (affectedRows1 > 0 && affectedRows2 > 0) {
+				                    connection.commit(); 
+				                    JOptionPane.showMessageDialog(null, "Kayıt başarıyla oluşturuldu!");
+				                    Login loginPage = new Login();
+				                    loginPage.setVisible(true);
+				                } else {
+				                    connection.rollback(); 
+				                    JOptionPane.showMessageDialog(null, "Kayıt oluşturulamadı. Lütfen tekrar deneyin.");
+				                }
+				            }
+				        } catch (SQLException ex) {
+				            ex.printStackTrace();
+				            JOptionPane.showMessageDialog(null, "Kayıt oluşturma sırasında bir hata oluştu.");
+				        }
+				    }
+				});
+		btnKayit.setBounds(335, 381, 85, 21);
+		contentPane.add(btnKayit);
+		
+	
+	}
 }
