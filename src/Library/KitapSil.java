@@ -19,13 +19,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
+import java.awt.Toolkit;
 
 public class KitapSil extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField tfKitapId;
-	static final String DB="jdbc:mysql://127.0.0.1:3306/mydb";
+	static final String DB="jdbc:mysql://127.0.0.1:3306/libraryautomation";
 	static final String USER="root";
 	static final String PASS="13577";
 
@@ -36,7 +37,7 @@ public class KitapSil extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					KitapSil frame = new KitapSil();
+					KitapSil frame = new KitapSil("");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -48,10 +49,11 @@ public class KitapSil extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public KitapSil() {
+	public KitapSil(String kullaniciAdi) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(KitapSil.class.getResource("/Library/img/kütüp.png")));
 		setTitle("Kitap Sil");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 600);
+		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(0, 139, 139));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -60,13 +62,13 @@ public class KitapSil extends JFrame {
 		contentPane.setLayout(null);
 		
 		tfKitapId = new JTextField();
-		tfKitapId.setBounds(276, 255, 96, 19);
+		tfKitapId.setBounds(405, 261, 161, 19);
 		contentPane.add(tfKitapId);
 		tfKitapId.setColumns(10);
 		
-		JLabel lblKitapId = new JLabel("ID");
+		JLabel lblKitapId = new JLabel("ID:");
 		lblKitapId.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblKitapId.setBounds(195, 257, 56, 13);
+		lblKitapId.setBounds(253, 263, 56, 13);
 		contentPane.add(lblKitapId);
 		
 		JButton btnSil = new JButton("SİL");
@@ -75,7 +77,7 @@ public class KitapSil extends JFrame {
 				int kitapID = Integer.parseInt(tfKitapId.getText());
                 String kitapAdi = "";
                 try (Connection connection = DriverManager.getConnection(DB, USER, PASS)) {
-                    String query = "SELECT BookName FROM mydb.books WHERE id = ?";
+                    String query = "SELECT BookName FROM libraryautomation.books WHERE id = ?";
                     try (PreparedStatement statement = connection.prepareStatement(query)) {
                         statement.setInt(1, kitapID);
                         try (ResultSet resultSet = statement.executeQuery()) {
@@ -92,7 +94,7 @@ public class KitapSil extends JFrame {
                         JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     try (Connection connection = DriverManager.getConnection(DB, USER, PASS)) {
-                        String query = "DELETE FROM mydb.books WHERE id = ?";
+                        String query = "DELETE FROM libraryautomation.books WHERE id = ?";
                         try (PreparedStatement statement = connection.prepareStatement(query)) {
                             statement.setInt(1, kitapID);
                             int affectedRows = statement.executeUpdate();
@@ -107,8 +109,21 @@ public class KitapSil extends JFrame {
                     }}
 			}
 		});
-		btnSil.setBounds(234, 296, 85, 21);
+		btnSil.setBounds(302, 304, 179, 30);
 		contentPane.add(btnSil);
+		
+		JButton btnAnasayfa = new JButton("AnaSayfa");
+		btnAnasayfa.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AdminAnaSayfa admin = new AdminAnaSayfa(kullaniciAdi);
+				admin.setVisible(true);
+        		dispose();
+			}
+		});
+		btnAnasayfa.setForeground(Color.BLACK);
+		btnAnasayfa.setFont(new Font("Tahoma", Font.BOLD, 15));
+		btnAnasayfa.setBounds(626, 523, 150, 30);
+		contentPane.add(btnAnasayfa);
 	}
 
 }

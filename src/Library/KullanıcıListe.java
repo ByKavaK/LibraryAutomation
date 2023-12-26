@@ -20,6 +20,9 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Toolkit;
 
 public class KullanıcıListe extends JFrame {
 
@@ -28,9 +31,10 @@ public class KullanıcıListe extends JFrame {
 	private JTable kulTable;
 	private JLabel lblKulAd;
 	private JTextField tfKulAd;
-	static final String DB="jdbc:mysql://127.0.0.1:3306/mydb";
+	static final String DB="jdbc:mysql://127.0.0.1:3306/libraryautomation";
 	static final String USER="root";
 	static final String PASS="13577";
+	private JButton btnAnasayfa;
 
 	/**
 	 * Launch the application.
@@ -39,7 +43,7 @@ public class KullanıcıListe extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					KullanıcıListe frame = new KullanıcıListe();
+					KullanıcıListe frame = new KullanıcıListe("");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -51,23 +55,25 @@ public class KullanıcıListe extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public KullanıcıListe() {
-		setTitle("Kullanıcı Liste");
+	public KullanıcıListe(String kullaniciAdi) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(KullanıcıListe.class.getResource("/Library/img/kütüp.png")));
+		setTitle("Kullanıcı Listesi");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 800);
+		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(102, 51, 0));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(0, 70, 808, 584);
+		scrollPane.setBounds(0, 70, 786, 426);
 		contentPane.add(scrollPane);
 		
 		kulTable = new JTable();
 		try (Connection connection = DriverManager.getConnection(DB, USER, PASS)) {
-		    String query = "SELECT `mydb`.`users`.id,`mydb`.`users`.KullanıcıAdı,`mydb`.`role`.RoleName FROM `mydb`.`users` JOIN `mydb`.`role` ON `users`.`role_id` =  `mydb`.`role`.id";
+		    String query = "SELECT `libraryautomation`.`users`.id,`libraryautomation`.`users`.KullaniciAdi,`libraryautomation`.`role`.Role_Name FROM `libraryautomation`.`users` JOIN `libraryautomation`.`role` ON `users`.`role_id` =  `libraryautomation`.`role`.id ORDER BY id ASC";
 		    try (PreparedStatement statement = connection.prepareStatement(query)) {
 		        try (ResultSet resultSet = statement.executeQuery()) {
 		            ResultSetMetaData metaData = resultSet.getMetaData();
@@ -97,21 +103,23 @@ public class KullanıcıListe extends JFrame {
 		scrollPane.setViewportView(kulTable);
 		
 		lblKulAd = new JLabel("Kullanıcı Adı");
+		lblKulAd.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblKulAd.setBounds(44, 28, 107, 19);
 		contentPane.add(lblKulAd);
 		
 		tfKulAd = new JTextField();
-		tfKulAd.setBounds(134, 28, 96, 19);
+		tfKulAd.setBounds(161, 28, 160, 19);
 		contentPane.add(tfKulAd);
 		tfKulAd.setColumns(10);
 		
 		JButton btnKulAra = new JButton("Ara");
+		btnKulAra.setFont(new Font("Tahoma", Font.BOLD, 15));
 		btnKulAra.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String kulAd = tfKulAd.getText();
 
 		        try (Connection connection = DriverManager.getConnection(DB, USER, PASS)) {
-		            String query = "SELECT users.id, users.KullanıcıAdı, mydb.role.RoleName FROM mydb.users JOIN mydb.role ON users.role_id = mydb.role.id WHERE users.KullanıcıAdı LIKE ?";
+		            String query = "SELECT users.id, users.KullaniciAdi, libraryautomation.role.RoleName FROM libraryautomation.users JOIN libraryautomation.role ON users.role_id = libraryautomation.role.id WHERE users.KullanıcıAdı LIKE ? ORDER BY id ASC";
 		            
 		            try (PreparedStatement statement = connection.prepareStatement(query)) {
 		                statement.setString(1, "%" + kulAd + "%");
@@ -141,7 +149,20 @@ public class KullanıcıListe extends JFrame {
 		        }
 			}
 		});
-		btnKulAra.setBounds(271, 27, 85, 21);
+		btnKulAra.setBounds(346, 27, 125, 21);
 		contentPane.add(btnKulAra);
+		
+		btnAnasayfa = new JButton("AnaSayfa");
+		btnAnasayfa.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AdminAnaSayfa admin = new AdminAnaSayfa(kullaniciAdi);
+				admin.setVisible(true);
+        		dispose();
+			}
+		});
+		btnAnasayfa.setForeground(Color.BLACK);
+		btnAnasayfa.setFont(new Font("Tahoma", Font.BOLD, 15));
+		btnAnasayfa.setBounds(626, 523, 150, 30);
+		contentPane.add(btnAnasayfa);
 	}
 }
